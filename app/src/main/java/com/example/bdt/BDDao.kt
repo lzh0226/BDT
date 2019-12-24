@@ -1,18 +1,22 @@
 package com.example.bdt
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface BDDao {
     @Insert
     suspend fun insertBD(bd: BD)
 
-    @Query("SELECT * FROM birthday")
-    suspend fun getAllBD(): LiveData<List<BD>>
+    @Update
+    suspend fun updateDB(bd: BD)
 
-    @Query("SELECT * FROM birthday WHERE id = ID")
-    suspend fun gatABD(): BD
+    @Delete
+    suspend fun deleteDB(bd: BD)
+
+    @Query("SELECT * FROM birthday")
+    fun getAllBD(): LiveData<List<BD>>
+
+    @Query("SELECT * FROM birthday WHERE id = :ID")
+    fun gatABD(ID: Int): BD
 }
