@@ -31,8 +31,8 @@ class BDAdapter internal constructor(context: Context)
 
     inner class BDViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textviewName: TextView = itemView.findViewById(R.id.textViewName)
-        val textviewDOB: TextView = itemView.findViewById(R.id.textViewDOB)
-    }
+    val textviewDOB: TextView = itemView.findViewById(R.id.textViewDOB)
+}
 
     internal fun setBDS(bds: List<BD>){
         this.bds = bds

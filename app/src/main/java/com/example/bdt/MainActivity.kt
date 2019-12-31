@@ -1,16 +1,21 @@
 package com.example.bdt
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var bdViewModel: BDViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +26,35 @@ class MainActivity : AppCompatActivity() {
         val adapter = BDAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        bdViewModel = ViewModelProvider(this).get(bdViewModel::class.java)
+        bdViewModel.allBDs.observe(
+            this,
+            Observer {
+                if(it.isNotEmpty()){
+                    adapter.setBDS(it)
+                }
+            }
+            )
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            val intent = Intent(this,AddActivity::class.java)
+            startActivityForResult(intent,REQUEST_CODE)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CODE){
+            if(resultCode == Activity.RESULT_OK){
+                val _name : String? = data?.getStringExtra(AddActivity.EXTRA_NAME)
+                val _dob : Long? = data?.getLongExtra(AddActivity.EXTRA_DOB, 0)
+                val bd: BD = BD(id=0, name = _name!!, dob = _dob!!)
+
+                //TODO : save data to ROOM
+                bdViewModel.insertBD(bd)
+
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -42,5 +71,9 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    companion object{
+        const val REQUEST_CODE = 1
     }
 }
